@@ -268,7 +268,7 @@ export default function Home() {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex items-center justify-between py-4">
           <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="shrink-0 hover:opacity-80 transition-opacity">
-            <img src="/assets/logo/suhomontaza-logo-horizontal.svg" alt="Suhomontaža" className="h-14 w-auto" />
+            <img src="/assets/logo/suhomontaza-logo-horizontal.svg?v=2" alt="Suhomontaža" className="h-14 w-auto" />
           </Link>
 
           {/* Desktop menu */}
