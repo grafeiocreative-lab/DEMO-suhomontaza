@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 220" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="55 38 660 148" role="img" aria-labelledby="title desc">
   <title id="title">Suhomontaža logo horizontalni</title>
   <desc id="desc">Horizontalni logo z oranžnim zložljivim metrom levo od napisa Suhomontaža.</desc>
   <g fill="none" fill-rule="evenodd">
-    <g transform="translate(74 55) scale(.58)">
+    <g transform="translate(74 72) scale(.58)">
       <g transform="translate(0 86)">
         <rect x="0" y="-15" width="170" height="30" rx="4" fill="#E8751A" />
         <g stroke="#FFFFFF" stroke-linecap="square" stroke-width="3">
@@ -40,7 +40,7 @@
       x="485"
       y="146"
       fill="#2D6B3A"
-      fill-opacity=".45"
+      fill-opacity=".75"
       font-family="Inter, Montserrat, Arial, sans-serif"
       font-size="14"
       font-weight="600"

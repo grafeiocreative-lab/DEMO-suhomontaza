@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 460" role="img" aria-labelledby="title desc">
   <title id="title">Suhomontaža logo vertikalni</title>
   <desc id="desc">Vertikalni logo z oranžnim zložljivim metrom nad napisom Suhomontaža.</desc>
   <g fill="none" fill-rule="evenodd">
-    <g transform="translate(190 54)">
+    <g transform="translate(190 94)">
       <g transform="translate(0 86)">
         <rect x="0" y="-15" width="170" height="30" rx="4" fill="#E8751A" />
         <g stroke="#FFFFFF" stroke-linecap="square" stroke-width="3">
@@ -28,7 +28,7 @@
     </g>
     <text
       x="320"
-      y="266"
+      y="306"
       fill="#2D6B3A"
       font-family="Inter, Montserrat, Arial, sans-serif"
       font-size="38"
@@ -38,7 +38,7 @@
     >SUHOMONTAŽA</text>
     <text
       x="320"
-      y="308"
+      y="348"
       fill="#2D6B3A"
       fill-opacity=".45"
       font-family="Inter, Montserrat, Arial, sans-serif"
