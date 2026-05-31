@@ -72,11 +72,11 @@
   --radius: 0.65rem;
 
   /* Brand */
-  --primary:            oklch(0.565 0.230 30);    /* terracotta — CTA gumbi */
+  --primary:            oklch(0.62 0.175 46);    /* terracotta — CTA gumbi */
   --primary-foreground: oklch(0.99 0 0);
   --brand:              oklch(0.44 0.105 150);     /* gozdna zelena — identiteta, hover, focus */
   --brand-foreground:   oklch(0.99 0 0);
-  --accent:             oklch(0.565 0.230 30);
+  --accent:             oklch(0.62 0.175 46);
   --accent-foreground:  oklch(0.99 0 0);
 
   /* Nevtrali — topla hue-75 družina */
@@ -94,12 +94,12 @@
   --input:              oklch(0.90 0.006 75);
   --ring:               oklch(0.44 0.105 150);    /* zeleni focus ring */
 
-  /* Destruktivno — prava rdeča, ločena od terracotte */
-  --destructive:        oklch(0.55 0.22 25);
+  /* Destruktivno — barva metra iz logotipa */
+  --destructive:        oklch(0.62 0.175 46);
   --destructive-foreground: oklch(0.99 0 0);
 
   /* Grafikoni */
-  --chart-1: oklch(0.565 0.230 30);
+  --chart-1: oklch(0.62 0.175 46);
   --chart-2: oklch(0.44 0.105 150);
   --chart-3: oklch(0.68 0.150 60);
   --chart-4: oklch(0.55 0.130 180);
@@ -108,7 +108,7 @@
   /* Stranska vrstica */
   --sidebar:                     oklch(0.99 0.004 75);
   --sidebar-foreground:          oklch(0.22 0.012 70);
-  --sidebar-primary:             oklch(0.565 0.230 30);
+  --sidebar-primary:             oklch(0.62 0.175 46);
   --sidebar-primary-foreground:  oklch(0.99 0 0);
   --sidebar-accent:              oklch(0.44 0.105 150);
   --sidebar-accent-foreground:   oklch(0.99 0 0);
@@ -118,11 +118,11 @@
 
 .dark {
   /* Brand — enako kot light */
-  --primary:            oklch(0.565 0.230 30);
+  --primary:            oklch(0.62 0.175 46);
   --primary-foreground: oklch(0.99 0 0);
   --brand:              oklch(0.54 0.115 150);    /* rahlo svetlejša zelena za temno ozadje */
   --brand-foreground:   oklch(0.99 0 0);
-  --accent:             oklch(0.565 0.230 30);
+  --accent:             oklch(0.62 0.175 46);
   --accent-foreground:  oklch(0.99 0 0);
 
   /* Nevtrali — topel temen grafit */
@@ -140,10 +140,10 @@
   --input:              oklch(1 0 0 / 14%);
   --ring:               oklch(0.54 0.115 150);
 
-  --destructive:        oklch(0.65 0.20 25);
+  --destructive:        oklch(0.68 0.175 46);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --chart-1: oklch(0.565 0.230 30);
+  --chart-1: oklch(0.62 0.175 46);
   --chart-2: oklch(0.54 0.115 150);
   --chart-3: oklch(0.72 0.150 60);
   --chart-4: oklch(0.60 0.130 180);
@@ -151,7 +151,7 @@
 
   --sidebar:                     oklch(0.20 0.008 70);
   --sidebar-foreground:          oklch(0.88 0.006 70);
-  --sidebar-primary:             oklch(0.565 0.230 30);
+  --sidebar-primary:             oklch(0.62 0.175 46);
   --sidebar-primary-foreground:  oklch(0.99 0 0);
   --sidebar-accent:              oklch(0.54 0.115 150);
   --sidebar-accent-foreground:   oklch(0.99 0 0);
@@ -166,6 +166,7 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;

@@ -258,20 +258,20 @@ export default function Calculator() {
                 {result && (
                   <div className={`p-4 rounded-lg border ${
                     result.success
-                      ? "bg-green-50 border-green-200"
-                      : "bg-red-50 border-red-200"
+                      ? "bg-brand/10 border-brand/20"
+                      : "bg-destructive/10 border-destructive/20"
                   }`}>
                     {result.success ? (
                       <div>
-                        <p className="text-sm font-semibold text-green-900 mb-2">Rezultat:</p>
-                        <p className="text-3xl font-bold text-green-600">
+                        <p className="text-sm font-semibold text-brand mb-2">Rezultat:</p>
+                        <p className="text-3xl font-bold text-brand">
                           {result.result?.toFixed(2)}
                         </p>
                       </div>
                     ) : (
                       <div>
-                        <p className="text-sm font-semibold text-red-900">Napaka:</p>
-                        <p className="text-red-700">{result.error}</p>
+                        <p className="text-sm font-semibold text-destructive">Napaka:</p>
+                        <p className="text-destructive">{result.error}</p>
                       </div>
                     )}
                   </div>

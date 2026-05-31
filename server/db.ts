@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, quotes, quoteItems, priceList } from "../drizzle/schema";
+import { InsertUser, users, quotes, quoteItems, priceList, inquiries, InsertInquiry } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -205,6 +205,12 @@ export async function createOrUpdatePriceListItem(item: {
     });
     return (result as any).insertId as number;
   }
+}
+
+export async function saveInquiry(data: InsertInquiry): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(inquiries).values(data);
 }
 
 export async function generateQuoteNumber(): Promise<string> {

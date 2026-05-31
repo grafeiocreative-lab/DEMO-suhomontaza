@@ -36,7 +36,7 @@ export default function QuoteDetail({ quoteId }: QuoteDetailProps) {
           </Button>
           <Card className="card-elegant mt-6">
             <CardHeader>
-              <CardTitle className="text-red-600">Napaka</CardTitle>
+              <CardTitle className="text-destructive">Napaka</CardTitle>
             </CardHeader>
             <CardContent>
               <p>Ponudba ni najdena ali pa nimate dostopa do nje.</p>

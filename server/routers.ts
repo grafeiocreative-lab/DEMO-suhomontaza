@@ -179,6 +179,23 @@ export const appRouter = router({
       }),
   }),
 
+  contact: router({
+    submit: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(255),
+        phone: z.string().max(50).optional(),
+        email: z.string().email().max(320).optional(),
+        message: z.string().max(2000).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        if (!input.phone && !input.email) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Vnesite telefon ali email" });
+        }
+        await db.saveInquiry(input);
+        return { success: true } as const;
+      }),
+  }),
+
   // Price list management
   priceList: router({
     // Get all active prices
