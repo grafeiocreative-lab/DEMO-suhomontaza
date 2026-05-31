@@ -74,8 +74,7 @@ export default function QuoteDetail({ quoteId }: QuoteDetailProps) {
 
         toast.success("PDF je bil uspešno prenesen");
       }
-    } catch (error) {
-      console.error("Error exporting PDF:", error);
+    } catch {
       toast.error("Napaka pri izvozу PDF");
     } finally {
       setIsExporting(false);

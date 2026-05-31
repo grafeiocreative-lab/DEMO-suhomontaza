@@ -1,170 +1,93 @@
-# Suhomontažerska Spletna Stran - Navodila za Namestitev
+# Suhomontaža Portal — Navodila za Namestitev
 
-Dobrodošli! To je profesionalna spletna stran za suhomontažerja s kalkulatorjem in upravljanjem ponudb.
+## Tech Stack
 
-## Značilnosti
+- **Frontend:** React 19, TypeScript, Tailwind CSS 4, Wouter (routing), tRPC client
+- **Backend:** Express 4, tRPC 11, Node.js
+- **Baza podatkov:** TiDB (MySQL kompatibilen), Drizzle ORM
+- **Avtentifikacija:** Manus OAuth
+- **PDF:** pdf-lib (native binary rendering)
 
-### Javni Del
-- **Domača stran** - Predstavitev storitev in kontaktni podatki
-- **Cenik** - Prikazuje cene storitev z in brez DDV (22%)
-- Eleganten dizajn s polno podporo za slovenske šumnike (š, č, ž)
+## Okoljespremenljivke (.env)
 
-### Privatni Del (Zahteva Prijavo)
-- **Popis Materiala** - Dinamično dodajanje in brisanje postavk
-- **Generator Ponudb** - Avtomatski izračun skupne vrednosti
-- **PDF Izvoz** - Izvoz ponudb v PDF format
-- **Zgodovina Ponudb** - Shranjevanje in upravljanje preteklih ponudb
+Ustvari datoteko `.env` v korenu projekta:
 
-### Skrit Kalkulator (Zaščiten z Geslom)
-- **Dostop:** `/kalkulator`
-- **Geslo:** `suhomontaza2026` (spremenite v produkciji!)
-- **Funkcionalnost:** Seštevanje, odštevanje, množenje, deljenje
-- **Integracija:** Samodejno pošiljanje rezultatov na Google Sheets
+```env
+# Baza podatkov (TiDB / MySQL)
+DATABASE_URL=mysql://user:password@host:4000/dbname
 
-## Namestitev Google Sheets Integracije
+# Session varnost
+JWT_SECRET=dolg-nakljucni-niz-vsaj-32-znakov
 
-### Korak 1: Ustvarite Google Sheets Preglednico
+# Manus OAuth
+VITE_APP_ID=tvoj-app-id
+VITE_OAUTH_PORTAL_URL=https://manus.im
+OAUTH_SERVER_URL=https://manus.im
+OWNER_OPEN_ID=tvoj-open-id
 
-1. Odprite [Google Sheets](https://sheets.google.com)
-2. Ustvarite novo preglednico
-3. Preimenuјte je na "Suhomontažer Kalkulator"
+# Skrit kalkulator — geslo, ki ga uporabnik vnese
+CALCULATOR_PASSWORD=tvojeVarinoGeslo
 
-### Korak 2: Namestite Apps Script
-
-1. V Google Sheets kliknite na **Extensions** → **Apps Script**
-2. Izbrišite privzeto kodo
-3. Kopirajte vsebino datoteke `google-apps-script.js` iz tega projekta
-4. Prilepite kodo v Apps Script editor
-5. Kliknite **Save** (Shrani)
-
-### Korak 3: Razporedite Web App
-
-1. Kliknite **Deploy** → **New deployment**
-2. Izberite **Web app** kot tip
-3. Nastavite:
-   - **Execute as:** Vaš Google račun
-   - **Who has access:** Anyone
-4. Kliknite **Deploy**
-5. Kopirajte prikazani URL
-
-### Korak 4: Posodobite Kalkulator
-
-1. Odprite datoteko `client/src/pages/Calculator.tsx`
-2. Poiščite vrstico:
-   ```typescript
-   const GOOGLE_SHEETS_URL = "https://script.google.com/macros/d/YOUR_SCRIPT_ID/usercallback";
-   ```
-3. Zamenjajte `YOUR_SCRIPT_ID` s pravim ID-jem iz koraka 3
-4. Shranite datoteko
-
-## Sprememba Gesla za Kalkulator
-
-1. Odprite `client/src/pages/Calculator.tsx`
-2. Poiščite vrstico:
-   ```typescript
-   const correctPassword = "suhomontaza2026";
-   ```
-3. Zamenjajte z novim geslom
-4. Shranite datoteko
-
-## Sprememba Cenika
-
-1. Prijavite se na spletno stran
-2. Pojdite na **Ponudbe** → **Upravljanje Cenika**
-3. Dodajte ali spremenite postavke cenika
-4. Spremembe se samodejno shranijo v bazo podatkov
-
-## Struktura Projekta
-
-```
-suhomontazer-portal/
-├── client/                 # Frontend (React)
-│   └── src/
-│       ├── pages/
-│       │   ├── Home.tsx           # Domača stran
-│       │   ├── Quotes.tsx         # Upravljanje ponudb
-│       │   ├── Calculator.tsx     # Skrit kalkulator
-│       │   └── QuoteDetail.tsx    # Podrobnosti ponudbe
-│       └── index.css              # Stilizacija
-├── server/                 # Backend (Express + tRPC)
-│   ├── routers.ts         # tRPC procedure
-│   ├── db.ts              # Funkcije za bazo podatkov
-│   └── pdf-generator.ts   # Generiranje PDF ponudb
-├── drizzle/               # Baza podatkov
-│   └── schema.ts          # Definicija tabel
-└── google-apps-script.js  # Google Apps Script koda
+# Google Sheets (opcijsko)
+VITE_GOOGLE_SHEETS_URL=https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
 ```
 
-## Razvoj
+## Zagon
 
-### Namestitev Odvisnosti
 ```bash
 pnpm install
+pnpm dev       # razvojni strežnik
+pnpm build     # produkcijska gradnja
+pnpm start     # zaženi produkcijsko gradnjo
+pnpm test      # testi
 ```
 
-### Zagon Razvojnega Strežnika
+## Baza podatkov
+
 ```bash
-pnpm dev
+pnpm drizzle-kit push    # ustvari tabele v bazi
+pnpm drizzle-kit studio  # vizualni pregled baze
 ```
 
-### Gradnja za Produkcijo
-```bash
-pnpm build
-pnpm start
+## Struktura projekta
+
+```
+DEMO-suhomontaza/
+├── client/src/
+│   ├── pages/
+│   │   ├── Home.tsx           # Javna domača stran
+│   │   ├── Quotes.tsx         # Upravljanje ponudb (zahteva prijavo)
+│   │   ├── QuoteDetail.tsx    # Podrobnosti + PDF izvoz
+│   │   └── Calculator.tsx     # Skrit kalkulator (geslo prek env)
+│   ├── components/
+│   │   └── Map.tsx            # Google Maps komponenta
+│   └── _core/hooks/useAuth.ts # OAuth auth hook
+├── server/
+│   ├── routers.ts             # tRPC API procedure
+│   ├── db.ts                  # Drizzle DB funkcije
+│   └── pdf-generator.ts       # pdf-lib generator
+├── drizzle/
+│   └── schema.ts              # Definicija DB tabel
+└── google-apps-script.js      # Apps Script koda za Google Sheets
 ```
 
-### Testiranje
-```bash
-pnpm test
-```
+## Google Sheets integracija (opcijsko)
 
-## Varnost
+1. Odpri Google Sheets → Extensions → Apps Script
+2. Kopiraj vsebino `google-apps-script.js`
+3. Deploy → New deployment → Web app → Anyone
+4. Kopiraj URL in nastavi `VITE_GOOGLE_SHEETS_URL` v `.env`
 
-### Geslo za Kalkulator
-- Spremenite privzeto geslo v `Calculator.tsx`
-- Uporabite močno geslo v produkciji
-- Razmislite o implementaciji pravega avtentifikacijskega sistema
+## Cenik
 
-### Baza Podatkov
-- Vsi podatki so shranjeni v varni bazi podatkov
-- Dostop je omejen na prijavljene uporabnike
-- Samo administratorji lahko upravljajo cenik
+Cenik se upravlja prek baze podatkov. Admin (lastnik računa) ima dostop prek
+tRPC procedure `priceList.createOrUpdate`. Frontend UI za upravljanje cenika
+**še ni implementiran** — začasno vstavi vnose neposredno v DB.
 
-### Google Sheets
-- Apps Script je dostopen samo avtentificiranim uporabnikom
-- Podatki se pošiljajo prek HTTPS
-- Spremenite dostop v Apps Script, če je potrebno
+## Znane omejitve
 
-## Pogosta Vprašanja
-
-### V: Kako spremenem barvo spletne strani?
-O: Odprite `client/src/index.css` in spremenite CSS spremenljivke v `:root` in `.dark` razredih.
-
-### V: Kako dodam nove postavke v cenik?
-O: Prijavite se in pojdite na Ponudbe → Upravljanje Cenika.
-
-### V: Kako izvozim ponudbo v PDF?
-O: Odprite ponudbo in kliknite na gumb "Prenesi PDF".
-
-### V: Kaj je geslo za kalkulator?
-O: Privzeto je `suhomontaza2026`. Spremenite ga v `Calculator.tsx`.
-
-### V: Kako vidim podatke iz Google Sheets?
-O: Odprite Google Sheets preglednico, ki ste jo ustvarili. Podatki se samodejno dodajajo v stolpec "Izračuni".
-
-## Tehnični Sklad
-
-- **Frontend:** React 19, TypeScript, Tailwind CSS 4
-- **Backend:** Express 4, tRPC 11, Node.js
-- **Baza Podatkov:** TiDB (MySQL kompatibilen)
-- **Avtentifikacija:** Manus OAuth
-- **PDF Generiranje:** pdf-lib
-- **Stilizacija:** Tailwind CSS s Custom Theme
-
-## Podpora
-
-Če imate vprašanja ali težave, prosim kontaktirajte razvojni tim.
-
-## Licenca
-
-Vse pravice pridržane © 2026 Suhomontaža
+- **PDF:** Helvetica pisava nima podpore za šumnike (ž, š, č). Za pravilno
+  renderiranje je treba vdelati slovensko pisavo (npr. Roboto).
+- **Kalkulator:** Ni zaščite pred brute-force napadi na geslo.
+- **CSP:** Nastavljeni varnostni headerji morda zahtevajo prilagoditev za
+  produkcijo (Google Maps, zunanji fonti).

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
 import { Loader2, Lock, Send } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 interface CalculatorResult {
   success: boolean;
-  result?: any;
+  result?: number;
   error?: string;
 }
 
@@ -18,35 +19,26 @@ export default function Calculator() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const verifyMutation = trpc.calculator.verify.useMutation();
 
-  // Calculator state
   const [input1, setInput1] = useState("");
   const [input2, setInput2] = useState("");
   const [operation, setOperation] = useState("add");
   const [result, setResult] = useState<CalculatorResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Google Sheets Web App URL - replace with your actual URL
-  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/d/YOUR_SCRIPT_ID/usercallback";
+  const googleSheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL as string | undefined;
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simple password check (in production, use proper authentication)
-    const correctPassword = "suhomontaza2026";
-
-    setTimeout(() => {
-      if (password === correctPassword) {
-        setIsAuthenticated(true);
-        setPassword("");
-        toast.success("Dostop Odobren");
-      } else {
-        toast.error("Napačno Geslo");
-      }
-      setIsLoading(false);
-    }, 500);
+    try {
+      await verifyMutation.mutateAsync({ password });
+      setIsAuthenticated(true);
+      setPassword("");
+      toast.success("Dostop Odobren");
+    } catch {
+      toast.error("Napačno Geslo");
+    }
   };
 
   const handleCalculate = async (e: React.FormEvent) => {
@@ -61,25 +53,6 @@ export default function Calculator() {
     setResult(null);
 
     try {
-      // Prepare data for Google Sheets
-      const data = {
-        operation,
-        value1: parseFloat(input1),
-        value2: parseFloat(input2),
-        timestamp: new Date().toISOString(),
-      };
-
-      // Send to Google Sheets Web App
-      const response = await fetch(GOOGLE_SHEETS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      // Since we can't read the response with no-cors, we'll calculate locally
       let calculatedResult: number;
 
       switch (operation) {
@@ -104,18 +77,25 @@ export default function Calculator() {
           calculatedResult = 0;
       }
 
-      setResult({
-        success: true,
-        result: calculatedResult,
-      });
+      if (googleSheetsUrl) {
+        fetch(googleSheetsUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            operation,
+            value1: parseFloat(input1),
+            value2: parseFloat(input2),
+            result: calculatedResult,
+            timestamp: new Date().toISOString(),
+          }),
+        }).catch(() => {});
+      }
 
-      toast.success("Rezultat je bil poslан na Google Sheets");
-    } catch (error) {
-      console.error("Error:", error);
-      setResult({
-        success: false,
-        error: "Napaka pri pošiljanju na Google Sheets",
-      });
+      setResult({ success: true, result: calculatedResult });
+      toast.success(googleSheetsUrl ? "Rezultat poslan na Google Sheets" : "Izračun uspešen");
+    } catch {
+      setResult({ success: false, error: "Napaka pri izračunu" });
       toast.error("Napaka pri izračunu");
     } finally {
       setIsSubmitting(false);
@@ -154,7 +134,7 @@ export default function Calculator() {
                   placeholder="Vnesite geslo"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
+                  disabled={verifyMutation.isPending}
                 />
               </div>
 
@@ -174,9 +154,9 @@ export default function Calculator() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isLoading}
+                disabled={verifyMutation.isPending}
               >
-                {isLoading ? (
+                {verifyMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     Preverjam...
@@ -203,7 +183,6 @@ export default function Calculator() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
         <div className="container flex items-center justify-between py-4">
           <h1 className="text-2xl font-bold text-accent">Kalkulator</h1>
@@ -222,14 +201,15 @@ export default function Calculator() {
         <div className="max-w-2xl mx-auto">
           <Card className="card-elegant">
             <CardHeader>
-              <CardTitle>Kalkulator z Google Sheets</CardTitle>
-              <CardDescription>
-                Izračunajte vrednost in rezultat bo samodejno poslan na Google Sheets
-              </CardDescription>
+              <CardTitle>Kalkulator</CardTitle>
+              {googleSheetsUrl && (
+                <CardDescription>
+                  Rezultat bo samodejno poslan na Google Sheets
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleCalculate} className="space-y-6">
-                {/* Operation Selection */}
                 <div>
                   <Label htmlFor="operation">Operacija</Label>
                   <select
@@ -245,7 +225,6 @@ export default function Calculator() {
                   </select>
                 </div>
 
-                {/* Input Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="input1">Prva Vrednost</Label>
@@ -276,7 +255,6 @@ export default function Calculator() {
                   </div>
                 </div>
 
-                {/* Result Display */}
                 {result && (
                   <div className={`p-4 rounded-lg border ${
                     result.success
@@ -285,30 +263,20 @@ export default function Calculator() {
                   }`}>
                     {result.success ? (
                       <div>
-                        <p className="text-sm font-semibold text-green-900 mb-2">
-                          Rezultat:
-                        </p>
+                        <p className="text-sm font-semibold text-green-900 mb-2">Rezultat:</p>
                         <p className="text-3xl font-bold text-green-600">
-                          {typeof result.result === "number"
-                            ? result.result.toFixed(2)
-                            : result.result}
-                        </p>
-                        <p className="text-xs text-green-700 mt-2">
-                          Rezultat je bil poslan na Google Sheets
+                          {result.result?.toFixed(2)}
                         </p>
                       </div>
                     ) : (
                       <div>
-                        <p className="text-sm font-semibold text-red-900">
-                          Napaka:
-                        </p>
+                        <p className="text-sm font-semibold text-red-900">Napaka:</p>
                         <p className="text-red-700">{result.error}</p>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Submit Button */}
                 <Button
                   type="submit"
                   size="lg"
@@ -323,37 +291,11 @@ export default function Calculator() {
                   ) : (
                     <>
                       <Send className="h-4 w-4" />
-                      Izračunaj in Pošlji
+                      {googleSheetsUrl ? "Izračunaj in Pošlji" : "Izračunaj"}
                     </>
                   )}
                 </Button>
               </form>
-            </CardContent>
-          </Card>
-
-          {/* Instructions */}
-          <Card className="card-elegant mt-6">
-            <CardHeader>
-              <CardTitle className="text-lg">Navodila</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <p>
-                <strong>1. Izbira Operacije:</strong> Izberite operacijo (seštevanje, odštevanje, množenje ali deljenje).
-              </p>
-              <p>
-                <strong>2. Vnos Vrednosti:</strong> Vnesite dve vrednosti za izračun.
-              </p>
-              <p>
-                <strong>3. Izračun:</strong> Kliknite "Izračunaj in Pošlji" za izračun rezultata.
-              </p>
-              <p>
-                <strong>4. Google Sheets:</strong> Rezultat bo samodejno poslan na Google Sheets in prikazan na zaslonu.
-              </p>
-              <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="text-xs text-muted-foreground">
-                  <strong>Opomba:</strong> Za polno integracijo z Google Sheets zamenjajte GOOGLE_SHEETS_URL s pravo URL-jem vašega Apps Script Web App-a.
-                </p>
-              </div>
             </CardContent>
           </Card>
         </div>

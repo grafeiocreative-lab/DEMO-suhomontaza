@@ -150,9 +150,8 @@ export default function Quotes() {
       ]);
 
       setActiveTab("history");
-    } catch (error) {
+    } catch {
       toast.error("Napaka pri ustvarjanju ponudbe");
-      console.error(error);
     }
   };
 

@@ -8,6 +8,19 @@ import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   system: systemRouter,
+
+  calculator: router({
+    verify: publicProcedure
+      .input(z.object({ password: z.string().max(200) }))
+      .mutation(({ input }) => {
+        const secret = process.env.CALCULATOR_PASSWORD;
+        if (!secret || input.password !== secret) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Napačno geslo" });
+        }
+        return { success: true } as const;
+      }),
+  }),
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -24,13 +37,13 @@ export const appRouter = router({
     // Create a new quote
     create: protectedProcedure
       .input(z.object({
-        clientName: z.string().min(1, "Ime naročnika je obvezno"),
-        clientAddress: z.string().optional(),
-        clientTaxId: z.string().optional(),
-        description: z.string().optional(),
-        paymentTerm: z.string().optional(),
+        clientName: z.string().min(1, "Ime naročnika je obvezno").max(200),
+        clientAddress: z.string().max(300).optional(),
+        clientTaxId: z.string().max(50).optional(),
+        description: z.string().max(2000).optional(),
+        paymentTerm: z.string().max(100).optional(),
         items: z.array(z.object({
-          name: z.string().min(1),
+          name: z.string().min(1).max(300),
           quantity: z.number().positive(),
           unit: z.string().min(1),
           pricePerUnitCents: z.number().nonnegative(),
@@ -61,8 +74,7 @@ export const appRouter = router({
           });
 
           return { id: quoteId, quoteNumber };
-        } catch (error) {
-          console.error("Failed to create quote:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri ustvarjanju ponudbe",
@@ -75,8 +87,7 @@ export const appRouter = router({
       .query(async () => {
         try {
           return await db.getAllQuotes();
-        } catch (error) {
-          console.error("Failed to get quotes:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri pridobivanju ponudb",
@@ -97,8 +108,7 @@ export const appRouter = router({
             });
           }
           return quote;
-        } catch (error) {
-          console.error("Failed to get quote:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri pridobivanju ponudbe",
@@ -116,8 +126,7 @@ export const appRouter = router({
         try {
           await db.updateQuoteStatus(input.id, input.status);
           return { success: true };
-        } catch (error) {
-          console.error("Failed to update quote status:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri posodabljanju statusa ponudbe",
@@ -132,8 +141,7 @@ export const appRouter = router({
         try {
           await db.deleteQuote(input.id);
           return { success: true };
-        } catch (error) {
-          console.error("Failed to delete quote:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri brisanju ponudbe",
@@ -162,8 +170,7 @@ export const appRouter = router({
             buffer: pdfBuffer.toString("base64"),
             filename: `ponudba-${quote.quoteNumber}.pdf`,
           };
-        } catch (error) {
-          console.error("Failed to generate PDF:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri generiranju PDF",
@@ -179,8 +186,7 @@ export const appRouter = router({
       .query(async () => {
         try {
           return await db.getPriceList();
-        } catch (error) {
-          console.error("Failed to get price list:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri pridobivanju cenika",
@@ -192,11 +198,11 @@ export const appRouter = router({
     createOrUpdate: protectedProcedure
       .input(z.object({
         id: z.number().optional(),
-        name: z.string().min(1),
-        unit: z.string().min(1),
+        name: z.string().min(1).max(300),
+        unit: z.string().min(1).max(20),
         pricePerUnit: z.number().positive(),
         vat: z.number().default(22),
-        description: z.string().optional(),
+        description: z.string().max(2000).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         // Only admin can manage price list
@@ -210,8 +216,7 @@ export const appRouter = router({
         try {
           const id = await db.createOrUpdatePriceListItem(input);
           return { id, success: true };
-        } catch (error) {
-          console.error("Failed to create/update price list item:", error);
+        } catch {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Napaka pri upravljanju cenika",
